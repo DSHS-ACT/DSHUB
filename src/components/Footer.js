@@ -32,7 +32,7 @@ function Footer() {
         </div>
         <div style={{ textAlign: "right" }}>
           <p style={{ color: "var(--text-color-light)", fontSize: "0.9rem" }}>
-            © 2025 A.C.T.(KE). All rights reserved.
+            © 2026 A.C.T.(KE). All rights reserved.
           </p>
           <p style={{ color: "var(--text-color-light)", fontSize: "0.8rem" }}>
             Developed by{" "}
