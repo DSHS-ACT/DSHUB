@@ -310,7 +310,10 @@ export const updateNotice = async (noticeId, updateData) => {
 };
 
 // 사용자 프로필 생성 또는 업데이트 (role 포함)
-export const createUserProfile = async (uid, { studentId, name, role }) => {
+export const createUserProfile = async (
+  uid,
+  { studentId, name, role, email }
+) => {
   try {
     await setDoc(
       doc(db, "userProfiles", uid),
@@ -318,6 +321,7 @@ export const createUserProfile = async (uid, { studentId, name, role }) => {
         studentId: studentId ?? null,
         name: name ?? null,
         role: role ?? "student", // 역할 저장 (기본: student)
+        ...(email ? { email } : {}),
         createdAt: new Date(),
       },
       { merge: true } // 기존 문서가 있으면 병합
@@ -337,6 +341,49 @@ export const getUserProfile = async (uid) => {
     } else {
       return null; // 프로필이 없는 경우
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 모든 사용자 프로필을 실시간으로 구독 (관리자용 유저 관리)
+export const listenToAllUserProfiles = (callback) => {
+  const q = collection(db, "userProfiles");
+  return onSnapshot(
+    q,
+    (querySnapshot) => {
+      const items = querySnapshot.docs.map((d) => ({
+        uid: d.id,
+        ...d.data(),
+      }));
+      callback(items);
+    },
+    (error) => {
+      console.error("Error listening to user profiles:", error);
+    }
+  );
+};
+
+// 사용자 프로필 수정 (이름/학번/역할/정지 여부 등)
+export const updateUserProfile = async (uid, patch) => {
+  if (!uid) throw new Error("uid는 필수입니다.");
+  try {
+    await updateDoc(doc(db, "userProfiles", uid), {
+      ...patch,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 사용자 프로필 삭제
+// 주의: Firestore의 프로필 문서만 삭제되며, Firebase Auth 계정 자체는 삭제되지 않습니다.
+// (Auth 계정 삭제는 Admin SDK/Cloud Functions에서만 가능) 삭제 후 재로그인 시 정보 입력 화면으로 이동합니다.
+export const deleteUserProfile = async (uid) => {
+  if (!uid) throw new Error("uid는 필수입니다.");
+  try {
+    await deleteDoc(doc(db, "userProfiles", uid));
   } catch (error) {
     throw error;
   }

@@ -5,6 +5,7 @@ import NoticeList from "../components/NoticeList";
 import InquiryList from "../components/InquiryList";
 import ReservationList from "../components/ReservationList";
 import PlaceList from "../components/PlaceList";
+import UserList from "../components/UserList";
 
 function Admin() {
   const { user } = useAuth();
@@ -109,6 +110,26 @@ function Admin() {
           >
             장소 관리
           </button>
+          <button
+            onClick={() => setActiveTab("users")}
+            style={{
+              padding: "0.8rem 1.5rem",
+              border: "none",
+              backgroundColor: "transparent",
+              color:
+                activeTab === "users"
+                  ? "var(--primary-color)"
+                  : "var(--text-color)",
+              borderBottom:
+                activeTab === "users"
+                  ? "2px solid var(--primary-color)"
+                  : "none",
+              cursor: "pointer",
+              fontWeight: activeTab === "users" ? "600" : "400",
+            }}
+          >
+            유저 관리
+          </button>
           {/* <button
             onClick={() => setActiveTab("init_places")}
             style={{
@@ -135,6 +156,7 @@ function Admin() {
         {activeTab === "inquiries" && <InquiryList />}
         {activeTab === "reservations" && <ReservationList />}
         {activeTab === "places" && <PlaceList />}
+        {activeTab === "users" && <UserList />}
         {/* {activeTab === "init_places" && <OneTimePlacesSeeder />} */}
       </div>
     </div>
