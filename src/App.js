@@ -15,6 +15,7 @@ import Reservations from "./pages/Reservations";
 import MyPage from "./pages/MyPage";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import AdminSetup from "./pages/AdminSetup";
 import CompleteProfile from "./pages/CompleteProfile";
 import Inquiry from "./pages/Inquiry";
 import "./styles/common.css";
@@ -151,6 +152,7 @@ function AppContent() {
             }
           />
           <Route path="/inquiry" element={<Inquiry />} />
+          <Route path="/admin-setup" element={<AdminSetup />} />
         </Routes>
       </main>
       <Footer />

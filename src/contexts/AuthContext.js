@@ -32,10 +32,18 @@ export const AuthProvider = ({ children }) => {
         // 1) Firestore 프로필 먼저 조회 (role 포함)
         const userProfile = await getUserProfile(firebaseUser.uid); // { studentId, name, role, ... } 예상
 
-        // 2) 역할 결정: 프로필.role > 이메일 기반 추론
-        const derivedFromEmail =
-          firebaseUser.email === "admin@dshs.kr" ? "admin" : "student";
-        const role = userProfile?.role ?? derivedFromEmail;
+        // 1-1) 관리자가 계정을 정지시킨 경우 로그인 차단
+        if (userProfile?.disabled) {
+          await signOut(auth);
+          setUser(null);
+          localStorage.removeItem("user");
+          alert("관리자에 의해 정지된 계정입니다. 문의를 통해 확인해주세요.");
+          return;
+        }
+
+        // 2) 역할 결정: 프로필.role, 없으면 기본값 student
+        // (관리자 승격은 /admin-setup의 claimAdmin 함수를 통해서만 가능)
+        const role = userProfile?.role ?? "student";
         const isAdmin = role === "admin";
 
         // 3) 앱 상태 구성
@@ -93,7 +101,12 @@ export const AuthProvider = ({ children }) => {
       const roleToSave = overrideRole ?? user.role ?? "student";
 
       // 역할 포함 저장
-      await createUserProfile(user.uid, { studentId, name, role: roleToSave });
+      await createUserProfile(user.uid, {
+        studentId,
+        name,
+        role: roleToSave,
+        email: user.email,
+      });
 
       // 최신 프로필 재조회 (role 포함)
       const updated = await getUserProfile(user.uid);
