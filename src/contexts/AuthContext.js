@@ -41,10 +41,9 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        // 2) 역할 결정: 프로필.role > 이메일 기반 추론
-        const derivedFromEmail =
-          firebaseUser.email === "admin@dshs.kr" ? "admin" : "student";
-        const role = userProfile?.role ?? derivedFromEmail;
+        // 2) 역할 결정: 프로필.role, 없으면 기본값 student
+        // (관리자 승격은 /admin-setup의 claimAdmin 함수를 통해서만 가능)
+        const role = userProfile?.role ?? "student";
         const isAdmin = role === "admin";
 
         // 3) 앱 상태 구성
